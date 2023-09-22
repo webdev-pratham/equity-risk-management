@@ -175,7 +175,7 @@ input::-webkit-outer-spin-button,
 	width: 450px;
 	background-color: #FFFF99;
 	display: grid;
-	grid-template-columns:400px;
+	grid-template-columns:1fr;
 	grid-template-rows: 30px 30px 30px;
 }
 
