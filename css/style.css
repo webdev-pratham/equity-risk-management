@@ -1,9 +1,11 @@
+html{background-color:grey;}
+
 *{
 	padding: 0 auto;
 	margin: 0 auto;
 	font-size: 18px;
 	box-sizing: border-box;
-    text-align: center;
+  text-align: center;
 }
 
 h1{color: #fff;}
@@ -13,11 +15,7 @@ h1{color: #fff;}
 }
 
 .main-wrapper {
-	background-color:lightcyan;
 	padding-top: 30px;
-	height: 100vh;
-	width: 100vw;
-	background: gray;
 }
 
 .sl-price-num{
@@ -25,7 +23,7 @@ h1{color: #fff;}
 }
 
 .contaier {
-	height:500px;
+
 	padding: 25px;
 	width: 450px;
 	background-color: white;
@@ -179,17 +177,5 @@ input::-webkit-outer-spin-button,
 	display: grid;
 	grid-template-columns:400px;
 	grid-template-rows: 30px 30px 30px;
-	grid-template-areas:;
 }
 
-.cap-1 {
-	grid-area:cap-1;
-}
-
-.cap-2 {
-	grid-area:cap-2;
-}
-
-.cap-3 {
-	grid-area:cap-3
-}
