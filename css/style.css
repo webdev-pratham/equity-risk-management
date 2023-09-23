@@ -15,7 +15,7 @@ h1{color: #fff;}
 }
 
 .main-wrapper {
-	padding-top: 30px;
+	padding-top: 20px;
 }
 
 .sl-price-num{
@@ -36,6 +36,7 @@ h1{color: #fff;}
 	"lbl-3 num-3"
 	"lbl-4 num-4"
 	"lbl-5 num-5"
+	"btn btn"
 	"lbl-6 num-6"
 	"lbl-7 num-7"
 	"lbl-8 num-8"
@@ -152,6 +153,20 @@ h1{color: #fff;}
 	background-color: #E2EFD9;
 }
 
+.btn {
+	padding-top: 10px;
+	grid-area:btn;
+	width: 100%	;
+	cursor:pointer;
+	border: none;
+}
+
+.btn:hover {
+	background-color: #ccffff;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+}
+
 .bg{
 	border: 1px solid black;
 	height: 100%;
@@ -171,11 +186,10 @@ input::-webkit-outer-spin-button,
 
 
 .cap {
-	padding: 25px;
+	padding-top: 25px;
 	width: 450px;
 	background-color: #FFFF99;
 	display: grid;
 	grid-template-columns:1fr;
 	grid-template-rows: 30px 30px 30px;
 }
-
