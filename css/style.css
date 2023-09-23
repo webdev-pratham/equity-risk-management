@@ -29,7 +29,7 @@ h1{color: #fff;}
 	background-color: white;
 	display: grid;
 	grid-template-columns:200px 200px ;
-	grid-template-rows: 45px 45px 45px 45px 45px 45px 45px 45px 45px 45px;
+	grid-template-rows: 45px 45px 45px 45px 45px 45px 45px 45px 45px 45px 45PX;
 	grid-template-areas:
 	"lbl-1 num-1"
 	"lbl-2 num-2"
@@ -186,7 +186,7 @@ input::-webkit-outer-spin-button,
 
 
 .cap {
-	padding-top: 25px;
+	padding-top: 20px;
 	width: 450px;
 	background-color: #FFFF99;
 	display: grid;
