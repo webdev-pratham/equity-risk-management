@@ -1,524 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-R">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F&O Risk Management Sheet</title>
+    <title>Equity Risk Management</title>
     
     <style>
-        /* 🛠️ Global Resets */
-        html {
-            height: 100%;
-        }
-        
-        * {
-            box-sizing: border-box;
+        /* Color Palette */
+        :root {
+            --darkest-green: #0D2B1D;
+            --dark-green: #345635;
+            --mid-green: #6B8F71;
+            --light-green-gray: #AEC3B0;
+            --lightest-green: #E3EFD3;
         }
 
-        /* CSS Variables for a clean, customizable dark theme */
-        :root {
-            --bg-dark: #161b22;
-            --card-bg: #36454F;
-            --text-light: #c9d1d9;
-            --border-color: #30363d;
-            --accent-color: #969696;
-            --accent-hover: #242424;
-            --input-bg: #21262d;
-            --output-bg: #1b2028;
-            --error-color: #f87171;
-            /* Spacing Variables */
-            --spacing-xs: 4px;
-            --spacing-sm: 8px;
-            --spacing-md: 12px;
-            --spacing-lg: 16px;
-            --spacing-xl: 20px;
+        /* Basic Setup & No-Scroll Layout */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        
-        /* Main container for mobile and desktop responsiveness */
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: var(--spacing-xl);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
-            margin: 5px 0; 
-        }
-
-        /* Typography */
-        h3 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: white;
-            text-align: center;
-            margin: 0px;
-        }
-
-        /* Section Headers */
-        .section-header {
-            font-size: 1.0rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-top: var(--spacing-lg); 
-            margin-bottom: var(--spacing-sm); 
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 2px;
-        }
-
-        /* Grid Layout for inputs and outputs */
-        .grid-layout {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-green-gray);
+            color: var(--darkest-green);
+            /* This 'grid' layout centers the content perfectly in the viewport */
             display: grid;
-            gap: var(--spacing-md);
-            grid-template-columns: 1fr;
-        }
-        
-        /* Change Reward Targets to 2x2 grid on mobile */
-        .grid-targets-mobile {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        /* HIDE Total Units Allowed by default (mobile first) */
-        #total-units-group {
-            display: none; 
+            place-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height */
+            overflow: hidden; /* Prevents scrolling */
         }
 
-        /* Ensure Lots to Trade spans the full row when Total Units is hidden */
-        #lots-to-trade-group {
-            grid-column: span 1 / span 1;
+        /* Main Calculator Container */
+        main {
+            background-color: var(--lightest-green);
+            padding: 1.5rem 2rem; 
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 480px; 
+            box-sizing: border-box; 
         }
-        
-        /* HIDE SL Per Unit by default (mobile first) */
-        #sl-per-unit-group {
-             display: none;
+
+        h3 {
+            text-align: center;
+            color: var(--darkest-green);
+            margin-top: 0;
+            margin-bottom: 1.25rem;
+            font-size: 1.75rem;
         }
-        
-        /* Ensure Rupees Risk takes up the full row when SL per Unit is hidden */
-        #rupees-risk-group {
-            grid-column: span 1 / span 1;
+
+        /* Form Styling */
+        form {
+            display: grid;
+            gap: 1rem; 
         }
-        
-        /* Input and Output Fields Styling */
+
         .input-group {
             display: flex;
             flex-direction: column;
         }
-        .input-group label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: var(--spacing-xs);
-        }
 
-        .input-field, .output-field {
-            width: 100%;
-            padding: 8px;
-            border-radius: 8px;
-            border: 2px solid;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            min-height: 38px;
-        }
-
-        .input-field {
-            background-color: var(--input-bg);
-            border-color: var(--border-color);
-            color: white;
-        }
-        .input-field:focus {
-            border-color: var(--accent-color);
-            outline: none;
-        }
-
-        .output-field {
-            background-color: var(--output-bg);
-            border-color: var(--border-color);
+        label {
+            margin-bottom: 0.4rem;
             font-weight: 600;
-            color: var(--accent-color);
-            text-align: right;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-        #lots-to-trade {
-            color: #66FF00;
-            font-size: 1.1rem;
-            background-color: #112a00;
+            color: var(--dark-green);
         }
 
-        /* Button Styling */
-        .calculate-button {
+        input[type="text"] {
             width: 100%;
-            margin-top: var(--spacing-lg);
-            padding: 10px 16px;
-            background-color: var(--accent-color);
-            color: white;
-            font-weight: bold;
+            padding: 0.75rem;
+            border: 2px solid var(--mid-green);
             border-radius: 8px;
-            transition: background-color 0.2s;
-            cursor: pointer;
+            background-color: #fff;
+            color: var(--darkest-green);
+            box-sizing: border-box; 
+            font-size: 1rem;
+        }
+
+        /* Calculate Button */
+        button {
+            background-color: var(--dark-green);
+            color: var(--lightest-green);
             border: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            /* Hidden since we're using automatic calculation now */
-            display: none; 
-        }
-        .calculate-button:hover {
-            background-color: var(--accent-hover);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Other Text */
-        .error-message {
-            color: var(--error-color);
-            margin-top: var(--spacing-md);
-            text-align: center;
-            font-weight: 500;
-            display: none;
+            padding: 0.9rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            margin-top: 0.25rem;
         }
 
-        /* ---------------------------------------------------- */
-        /* 💡 MOBILE-SPECIFIC CHANGES (Max width 767px) */
-        /* ---------------------------------------------------- */
-        @media (max-width: 767px) {
-            .container {
-                padding: var(--spacing-md);
-            }
-            
-            h3 {
-                font-size: 1.3rem; 
-            }
-            
-            .section-header {
-                margin-top: var(--spacing-md);
-                margin-bottom: var(--spacing-xs);
-            }
-            
-            .grid-layout {
-                gap: var(--spacing-sm);
-            }
+        button:hover {
+            background-color: var(--darkest-green);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Results Section */
+        #results {
+            margin-top: 1.25rem;
+            border-top: 2px solid var(--light-green-gray);
+            padding-top: 1.25rem;
+            display: grid;
+            gap: 0.75rem; 
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* Default background: Light Green Gray */
+            background-color: var(--light-green-gray); 
+            padding: 0.6rem 0.9rem; 
+            border-radius: 8px;
+        }
+
+        /* Styling for the Target elements for high contrast */
+        .result-item.target {
+            background-color: var(--dark-green); /* Darker background */
         }
         
-        /* ---------------------------------------------------- */
-        /* Desktop/Tablet Styles (min-width: 768px) */
-        /* ---------------------------------------------------- */
-        @media (min-width: 768px) {
-            .grid-cols-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .grid-cols-4 {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            .col-span-2 {
-                grid-column: span 2 / span 2;
-            }
-            
-            /* Re-enable hidden elements on larger screens */
-            #total-units-group {
-                display: flex; 
-            }
-            #sl-per-unit-group {
-                display: flex;
-            }
-            
-            /* Reset mobile full-span overrides */
-            #lots-to-trade-group {
-                grid-column: span 1 / span 1; 
-            }
-            #rupees-risk-group {
-                grid-column: span 1 / span 1;
-            }
+        .result-item span:first-child {
+            font-weight: 600;
+            color: var(--darkest-green);
+            font-size: 0.9rem;
         }
+
+        /* Text colors for high contrast targets */
+        .result-item.target span {
+            color: var(--lightest-green) !important; 
+        }
+
+        .result-item span:last-child {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--dark-green);
+        }
+
+        /* 2-Column Grid for Targets */
+        .target-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h3 id="main-heading">F&O Risk Management</h3>
-
-    <div class="section-header">Trade Inputs</div>
-    
-    <div class="grid-layout grid-cols-2">
+    <main>
+        <h3>Equity Risk Management</h3>
         
-        <div class="input-group">
-            <label for="capital">Capital (₹)</label>
-            <input type="text" id="capital" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
-        </div>
+        <form id="calc-form">
+            <div class="input-group">
+                <label for="risk">Risk (₹)</label>
+                <input type="text" inputmode="decimal" id="risk" placeholder="Enter max risk amount" required>
+            </div>
 
-        <div class="input-group">
-            <label for="risk-percentage">% Risk per trade</label>
-            <input type="number" id="risk-percentage" class="input-field" step="any" oninput="calculateRisk()">
-        </div>
+            <div class="input-group">
+                <label for="entry">Entry Price (₹)</label>
+                <input type="text" inputmode="decimal" id="entry" placeholder="Enter entry price" required>
+            </div>
 
-        <div class="input-group">
-            <label for="entry">Entry Price (₹)</label>
-            <input type="text" id="entry" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
-        </div>
+            <div class="input-group">
+                <label for="stoploss">Stop Loss Price (₹)</label>
+                <input type="text" inputmode="decimal" id="stoploss" placeholder="Enter stop loss price" required>
+            </div>
 
-        <div class="input-group">
-            <label for="stoploss">Stoploss Price (₹)</label>
-            <input type="text" id="stoploss" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
-        </div>
+            <button type="submit">Calculate</button>
+        </form>
 
-        <div class="input-group col-span-2">
-            <label for="lot-size">Lot size (Units)</label>
-            <input type="text" id="lot-size" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
+        <div id="results">
+            <div class="result-item">
+                <span>SL Rupees Per Share</span>
+                <span id="out-sl-rupees">0.00</span>
+            </div>
+            <div class="result-item">
+                <span>Total Shares to Trade</span>
+                <span id="out-total-shares">0.00</span>
+            </div>
+
+            <div class="target-grid">
+                <div class="result-item target">
+                    <span>Target (1:1)</span>
+                    <span id="out-t1">0.00</span>
+                </div>
+                <div class="result-item target">
+                    <span>Target (1:2)</span>
+                    <span id="out-t2">0.00</span>
+                </div>
+                <div class="result-item target">
+                    <span>Target (1:3)</span>
+                    <span id="out-t3">0.00</span>
+                </div>
+                <div class="result-item target">
+                    <span>Target (1:5)</span>
+                    <span id="out-t5">0.00</span>
+                </div>
+            </div>
+
+            <div class="result-item">
+                <span>Approx. Capital Required</span>
+                <span id="out-capital">0.00</span>
+            </div>
         </div>
+    </main>
+
+    <script>
+        // --- HELPER FUNCTIONS ---
         
-    </div>
-
-    <button onclick="calculateRisk()" class="calculate-button">
-        Calculate Risk and Targets
-    </button>
-
-    <div class="section-header">Risk Summary</div>
-    
-    <div class="grid-layout grid-cols-2">
-
-        <div class="input-group" id="rupees-risk-group"> 
-            <label>Rupees Risk per trade (₹)</label>
-            <output id="rupees-risk" class="output-field">0.00</output>
-        </div>
-
-        <div class="input-group" id="sl-per-unit-group">
-            <label>SL per unit (₹)</label>
-            <output id="sl-per-unit" class="output-field">0.00</output>
-        </div>
-    </div>
-
-    <div class="section-header">Position Sizing</div>
-
-    <div class="grid-layout grid-cols-2">
-
-        <div class="input-group" id="total-units-group"> 
-            <label>Total Units Allowed</label>
-            <output id="total-units" class="output-field">0.00</output>
-        </div>
-
-        <div class="input-group" id="lots-to-trade-group">
-            <label>Lots to Trade</label>
-            <output id="lots-to-trade" class="output-field">0.00</output>
-        </div>
-    </div>
-
-    <div class="section-header">Reward Targets (Based on SL per unit)</div>
-    
-    <div class="grid-layout grid-cols-4 grid-targets-mobile">
-        <div class="input-group">
-            <label>Target 1:1 (₹)</label>
-            <output id="target-1-1" class="output-field">0.00</output>
-        </div>
-
-        <div class="input-group">
-            <label>Target 1:2 (₹)</label>
-            <output id="target-1-2" class="output-field">0.00</output>
-        </div>
-
-        <div class="input-group">
-            <label>Target 1:3 (₹)</label>
-            <output id="target-1-3" class="output-field">0.00</output>
-        </div>
-
-        <div class="input-group">
-            <label>Target 1:5 (₹)</label>
-            <output id="target-1-5" class="output-field">0.00</output>
-        </div>
-    </div>
-    
-    <p id="error-message" class="error-message"></p>
-</div>
-
-<script>
-    /**
-     * Helper function to remove commas and other non-numeric characters (except decimals) 
-     * from an input string, ready for mathematical parsing.
-     */
-    const cleanNumber = (value) => {
-        if (!value) return '';
-        return value.toString().replace(/,/g, '').trim();
-    };
-
-    /**
-     * Custom function to format a number using the Indian numbering system (lakh/crore) 
-     * with an optional number of decimal places for output fields.
-     */
-    const formatIndianNumber = (num, decimals = 2) => {
-        if (typeof num !== 'number' || isNaN(num) || num === null) {
-            return decimals === 0 ? '0' : '0.00';
+        // Formats numbers to Indian currency style (e.g., 1,23,456.78)
+        function formatToLakhCurrency(num) {
+            if (isNaN(num) || !isFinite(num)) return "0.00";
+            return num.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
         }
         
-        const isNegative = num < 0;
-        let absNum = Math.abs(num);
-
-        let numStr = absNum.toString();
-        let [integerPart, fractionalPart] = numStr.split('.');
-        
-        // --- TRUNCATION LOGIC ---
-        if (decimals > 0) {
-            fractionalPart = fractionalPart ? fractionalPart.substring(0, decimals) : '';
-            fractionalPart = fractionalPart.padEnd(decimals, '0');
-        } else {
-            fractionalPart = '';
+        // Formats numbers for display in the *input box*
+        function formatForInput(num) {
+            if (isNaN(num) || !isFinite(num)) return "";
+            return num.toLocaleString('en-IN', {
+                maximumFractionDigits: 2
+            });
         }
 
-        // Apply Indian formatting logic to the integer part (lakh/crore)
-        let lastThree = integerPart.slice(-3);
-        let remaining = integerPart.slice(0, -3);
-
-        if (remaining.length > 0) {
-            remaining = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
-            integerPart = remaining + ',' + lastThree;
-        } else {
-            integerPart = lastThree;
+        // Removes commas from a formatted string for calculation
+        function unformatNumber(val) {
+            if (!val) return NaN;
+            return parseFloat(val.toString().replace(/,/g, ''));
         }
+        // --- END OF HELPER FUNCTIONS ---
 
-        let result = integerPart;
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Get references to DOM elements
+            const form = document.getElementById('calc-form');
+            
+            const riskInput = document.getElementById('risk');
+            const entryInput = document.getElementById('entry');
+            const stoplossInput = document.getElementById('stoploss');
+            const allInputs = [riskInput, entryInput, stoplossInput]; 
 
-        // Add decimal part back if necessary
-        if (decimals > 0) {
-            result += '.' + fractionalPart;
-        }
+            const slRupeesEl = document.getElementById('out-sl-rupees');
+            const totalSharesEl = document.getElementById('out-total-shares');
+            const capitalEl = document.getElementById('out-capital');
+            const t1El = document.getElementById('out-t1');
+            const t2El = document.getElementById('out-t2');
+            const t3El = document.getElementById('out-t3');
+            const t5El = document.getElementById('out-t5');
 
-        return isNegative ? '-' + result : result;
-    };
+            // Add submit event listener to the form
+            form.addEventListener('submit', (e) => {
+                e.preventDefault(); 
+                calculate();
+            });
+            
+            // Input Formatting and Live Calculation Listeners
+            allInputs.forEach(input => {
+                // On focus (clicking IN), un-format the number for editing
+                input.addEventListener('focus', () => {
+                    const unformattedValue = unformatNumber(input.value);
+                    if (!isNaN(unformattedValue)) {
+                        input.value = unformattedValue;
+                    } else {
+                        input.value = ""; 
+                    }
+                });
 
-
-    /**
-     * Formats the value of an input element with Indian (lakh/crore) comma separation 
-     * in real-time as the user types.
-     * Note: calculateRisk() is now chained after this function in the HTML.
-     */
-    const formatInput = (element) => {
-        const cursorPosition = element.selectionStart;
-        const originalValue = element.value;
-
-        // 1. Clean the value for processing (remove existing commas)
-        let cleanedValue = cleanNumber(originalValue);
-
-        // 2. Handle decimal point temporarily
-        let parts = cleanedValue.split('.');
-        let integerPart = parts[0];
-        let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
-
-        // 3. Apply Indian formatting to the integer part
-        let lastThree = integerPart.slice(-3);
-        let remaining = integerPart.slice(0, -3);
-
-        if (remaining.length > 0) {
-            remaining = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
-            integerPart = remaining + ',' + lastThree;
-        } else {
-            integerPart = lastThree;
-        }
-        
-        let formattedValue = integerPart + decimalPart;
-
-        // 4. Update the input value
-        element.value = formattedValue;
-        
-        // 5. Calculate new cursor position
-        const newCommasCount = (formattedValue.match(/,/g) || []).length;
-        const oldCommasCount = (originalValue.match(/,/g) || []).length;
-        
-        let newCursorPosition = cursorPosition + (newCommasCount - oldCommasCount);
-        
-        // Ensure cursor is placed correctly, especially if a comma was just added
-        if (newCursorPosition >= 0 && newCursorPosition <= formattedValue.length) {
-            element.setSelectionRange(newCursorPosition, newCursorPosition);
-        }
-        // Calculation is now triggered by the chained call in the HTML 'oninput' attribute
-    };
+                // On blur (clicking OUT), format the number with commas
+                input.addEventListener('blur', () => {
+                    if (input.value) {
+                        const num = parseFloat(input.value);
+                        input.value = formatForInput(num);
+                    }
+                });
+                
+                // Live calculation
+                input.addEventListener('input', calculate);
+            });
 
 
-    function calculateRisk() {
-        const errorMessageElement = document.getElementById('error-message');
-        
-        // Retrieve values, ensuring they are parsed correctly
-        const capital = parseFloat(cleanNumber(document.getElementById('capital').value));
-        const riskPercentage = parseFloat(document.getElementById('risk-percentage').value);
-        const lotSize = parseFloat(cleanNumber(document.getElementById('lot-size').value));
-        const entryPrice = parseFloat(cleanNumber(document.getElementById('entry').value));
-        const stopLossPrice = parseFloat(cleanNumber(document.getElementById('stoploss').value));
+            function calculate() {
+                // Un-format values before parsing
+                const risk = unformatNumber(riskInput.value);
+                const entry = unformatNumber(entryInput.value);
+                const stoploss = unformatNumber(stoplossInput.value);
 
-        // Reset outputs and error message
-        errorMessageElement.style.display = 'none';
-        document.getElementById('rupees-risk').textContent = '0.00';
-        document.getElementById('sl-per-unit').textContent = '0.00';
-        document.getElementById('total-units').textContent = '0.00';
-        document.getElementById('lots-to-trade').textContent = '0.00';
-        document.getElementById('target-1-1').textContent = '0.00';
-        document.getElementById('target-1-2').textContent = '0.00';
-        document.getElementById('target-1-3').textContent = '0.00';
-        document.getElementById('target-1-5').textContent = '0.00';
+                // Check for valid inputs
+                if (isNaN(risk) || isNaN(entry) || isNaN(stoploss)) {
+                    clearResults();
+                    return;
+                }
 
+                // --- Calculations ---
+                
+                // 1. Calculate SL Rupees Per Share
+                // *** KEY CHANGE: Use Math.abs() to handle both long (entry > stoploss) and short (entry < stoploss) trades ***
+                const slRupees = Math.abs(entry - stoploss); 
+                
+                // Check for invalid calculation (stoploss = entry)
+                if (slRupees === 0) {
+                    clearResults();
+                    slRupeesEl.textContent = "Error (SL = Entry)";
+                    totalSharesEl.textContent = "Error";
+                    return;
+                }
 
-        // 1. Validate Inputs (Only proceed if ALL critical numbers are valid)
-        if (isNaN(capital) || isNaN(riskPercentage) || isNaN(lotSize) || isNaN(entryPrice) || isNaN(stopLossPrice)) {
-            // No error message shown on initial load or partial entry, just return silently
-            return;
-        }
+                // Determine the direction of the trade for target calculation
+                const isLongTrade = entry > stoploss;
+                const sign = isLongTrade ? 1 : -1;
 
-        if (riskPercentage <= 0 || lotSize <= 0 || capital <= 0) {
-            errorMessageElement.textContent = 'Capital, Risk %, and Lot Size must be greater than zero.';
-            errorMessageElement.style.display = 'block';
-            return;
-        }
+                // 2. Calculate Total Shares to Trade
+                const totalShares = risk / slRupees;
 
-        // 2. Calculate Rupees Risk Per Trade (R)
-        const rupeesRiskPerTrade = capital * (riskPercentage / 100);
-        document.getElementById('rupees-risk').textContent = formatIndianNumber(rupeesRiskPerTrade, 2);
+                // 3. Calculate Approx. Capital Required
+                const capital = entry * totalShares;
 
-        // 3. Calculate SL per Unit (SLU)
-        const slPerUnit = Math.abs(entryPrice - stopLossPrice);
-        document.getElementById('sl-per-unit').textContent = formatIndianNumber(slPerUnit, 2);
-        
-        if (slPerUnit === 0) {
-            errorMessageElement.textContent = 'Entry Price and Stoploss Price cannot be the same (SL per unit is zero).';
-            errorMessageElement.style.display = 'block';
-            return;
-        }
+                // 4. Calculate Targets
+                // Targets are now calculated based on the trade direction (sign)
+                const t1 = entry + (slRupees * 1 * sign);
+                const t2 = entry + (slRupees * 2 * sign);
+                const t3 = entry + (slRupees * 3 * sign);
+                const t5 = entry + (slRupees * 5 * sign);
 
-        // 4. Calculate Total Units Allowed (U)
-        const totalUnits = rupeesRiskPerTrade / slPerUnit;
-        document.getElementById('total-units').textContent = formatIndianNumber(totalUnits, 2);
-
-        // 5. Calculate Lots to Trade (LTT)
-        const calculatedLots = totalUnits / lotSize;
-        document.getElementById('lots-to-trade').textContent = formatIndianNumber(calculatedLots, 2);
-
-        // 6. Calculate Targets
-        
-        const isLongTrade = entryPrice > stopLossPrice;
-        
-        // Target calculation helper
-        const calculateTarget = (multiplier) => {
-            const priceMove = slPerUnit * multiplier;
-            let target;
-            if (isLongTrade) {
-                target = entryPrice + priceMove;
-            } else { 
-                target = entryPrice - priceMove;
+                // --- UI Update (Using Lakh/2-decimal format) ---
+                slRupeesEl.textContent = formatToLakhCurrency(slRupees);
+                totalSharesEl.textContent = formatToLakhCurrency(totalShares); 
+                capitalEl.textContent = formatToLakhCurrency(capital);
+                t1El.textContent = formatToLakhCurrency(t1);
+                t2El.textContent = formatToLakhCurrency(t2);
+                t3El.textContent = formatToLakhCurrency(t3);
+                t5El.textContent = formatToLakhCurrency(t5);
             }
-            return formatIndianNumber(target, 2);
-        };
-        
-        document.getElementById('target-1-1').textContent = calculateTarget(1);
-        document.getElementById('target-1-2').textContent = calculateTarget(2);
-        document.getElementById('target-1-3').textContent = calculateTarget(3);
-        document.getElementById('target-1-5').textContent = calculateTarget(5);
-    }
 
-    // Optional: Run on page load to set initial output formats
-    document.addEventListener('DOMContentLoaded', calculateRisk);
-</script>
+            function clearResults() {
+                slRupeesEl.textContent = "0.00";
+                totalSharesEl.textContent = "0.00"; 
+                capitalEl.textContent = "0.00";
+                t1El.textContent = "0.00";
+                t2El.textContent = "0.00";
+                t3El.textContent = "0.00";
+                t5El.textContent = "0.00";
+            }
+        });
+    </script>
 
 </body>
 </html>
