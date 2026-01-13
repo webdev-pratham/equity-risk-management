@@ -1,123 +1,524 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Equity Risk Management</title>
-    <meta charset="utf-8">
-    <meta name="description" content="Risk management sheet for equity trading">
-    <meta name="keywords" content="">
-    <meta name="author" content="prathamesh bardiya">
+    <meta charset="UTF-R">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>F&O Risk Management Sheet</title>
+    
+    <style>
+        /* 🛠️ Global Resets */
+        html {
+            height: 100%;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        /* CSS Variables for a clean, customizable dark theme */
+        :root {
+            --bg-dark: #161b22;
+            --card-bg: #36454F;
+            --text-light: #c9d1d9;
+            --border-color: #30363d;
+            --accent-color: #969696;
+            --accent-hover: #242424;
+            --input-bg: #21262d;
+            --output-bg: #1b2028;
+            --error-color: #f87171;
+            /* Spacing Variables */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        
+        /* Main container for mobile and desktop responsiveness */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: var(--spacing-xl);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+            margin: 5px 0; 
+        }
+
+        /* Typography */
+        h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: white;
+            text-align: center;
+            margin: 0px;
+        }
+
+        /* Section Headers */
+        .section-header {
+            font-size: 1.0rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: var(--spacing-lg); 
+            margin-bottom: var(--spacing-sm); 
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2px;
+        }
+
+        /* Grid Layout for inputs and outputs */
+        .grid-layout {
+            display: grid;
+            gap: var(--spacing-md);
+            grid-template-columns: 1fr;
+        }
+        
+        /* Change Reward Targets to 2x2 grid on mobile */
+        .grid-targets-mobile {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        /* HIDE Total Units Allowed by default (mobile first) */
+        #total-units-group {
+            display: none; 
+        }
+
+        /* Ensure Lots to Trade spans the full row when Total Units is hidden */
+        #lots-to-trade-group {
+            grid-column: span 1 / span 1;
+        }
+        
+        /* HIDE SL Per Unit by default (mobile first) */
+        #sl-per-unit-group {
+             display: none;
+        }
+        
+        /* Ensure Rupees Risk takes up the full row when SL per Unit is hidden */
+        #rupees-risk-group {
+            grid-column: span 1 / span 1;
+        }
+        
+        /* Input and Output Fields Styling */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .input-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .input-field, .output-field {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            min-height: 38px;
+        }
+
+        .input-field {
+            background-color: var(--input-bg);
+            border-color: var(--border-color);
+            color: white;
+        }
+        .input-field:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .output-field {
+            background-color: var(--output-bg);
+            border-color: var(--border-color);
+            font-weight: 600;
+            color: var(--accent-color);
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        #lots-to-trade {
+            color: #66FF00;
+            font-size: 1.1rem;
+            background-color: #112a00;
+        }
+
+        /* Button Styling */
+        .calculate-button {
+            width: 100%;
+            margin-top: var(--spacing-lg);
+            padding: 10px 16px;
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            /* Hidden since we're using automatic calculation now */
+            display: none; 
+        }
+        .calculate-button:hover {
+            background-color: var(--accent-hover);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Other Text */
+        .error-message {
+            color: var(--error-color);
+            margin-top: var(--spacing-md);
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        /* ---------------------------------------------------- */
+        /* 💡 MOBILE-SPECIFIC CHANGES (Max width 767px) */
+        /* ---------------------------------------------------- */
+        @media (max-width: 767px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+            
+            h3 {
+                font-size: 1.3rem; 
+            }
+            
+            .section-header {
+                margin-top: var(--spacing-md);
+                margin-bottom: var(--spacing-xs);
+            }
+            
+            .grid-layout {
+                gap: var(--spacing-sm);
+            }
+        }
+        
+        /* ---------------------------------------------------- */
+        /* Desktop/Tablet Styles (min-width: 768px) */
+        /* ---------------------------------------------------- */
+        @media (min-width: 768px) {
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-cols-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .col-span-2 {
+                grid-column: span 2 / span 2;
+            }
+            
+            /* Re-enable hidden elements on larger screens */
+            #total-units-group {
+                display: flex; 
+            }
+            #sl-per-unit-group {
+                display: flex;
+            }
+            
+            /* Reset mobile full-span overrides */
+            #lots-to-trade-group {
+                grid-column: span 1 / span 1; 
+            }
+            #rupees-risk-group {
+                grid-column: span 1 / span 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!--Main wrapper-->
-    <div class="main-wrapper">
-        <h1>Equity Risk Management Sheet</h1> <br/>
-        <div class="contaier">
-            <div class="lbl-1 bg">
-                Risk
-            </div>
-            <div class="lbl-2 bg">
-                Entry Price
-            </div>
 
-            <div class="lbl-3 bg">
-                Stop Loss Price
-            </div>
+<div class="container">
+    <h3 id="main-heading">F&O Risk Management</h3>
 
-            <div class="lbl-4 bg">
-                SL Rupees Per Share
-            </div>
-
-            <div class="lbl-5 bg">
-                Total Shares to Trade
-            </div>
-
-            <div class="lbl-6 bg">
-                Target
-            </div>
-
-            <div class="lbl-7 bg">
-                1:1
-            </div>
-
-            <div class="lbl-8 bg">
-                1:2
-            </div>
-
-            <div class="lbl-9 bg">
-                1:3
-            </div>
-
-            <div class="lbl-10 bg">
-                1:5
-            </div>
-
-            <div class="num-1 bg">
-                <input type="number" class=" bold" id="risk" placeholder="1% of your capital">
-            </div>
-
-            <div class="num-2 bg">
-                <input type="number" id="entry" placeholder="Entry price as per strategy">
-            </div>
-
-            <div class="num-3 bg">
-                <input type="number" class="sl-price-num" id="sl" placeholder="Stoploss is compulsory">
-            </div>
-
-            <div class="num-4 bg" id="n4">
-                
-            </div>
-
-            <div class="num-5 bg" id="tst">
-                
-            </div>
-
-            <div class="num-6 bg">
-                Price
-            </div>
-
-            <div class="num-7 bg" id="T1">
-                
-            </div>
-
-            <div class="num-8 bg" id="T2">
-                
-            </div>
-
-            <div class="num-9 bg" id="T3">
-                
-            </div>
-
-            <div class="num-10 bg" id="T4">
-                
-            </div>
-            
-            <div class="btn" id="calc" type="button">
-                Calculate...
-            </div>
-
+    <div class="section-header">Trade Inputs</div>
+    
+    <div class="grid-layout grid-cols-2">
+        
+        <div class="input-group">
+            <label for="capital">Capital (₹)</label>
+            <input type="text" id="capital" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
         </div>
 
+        <div class="input-group">
+            <label for="risk-percentage">% Risk per trade</label>
+            <input type="number" id="risk-percentage" class="input-field" step="any" oninput="calculateRisk()">
+        </div>
 
-        <div class="cap">
-            <div class="cap1">
-                Approx. Capital Required                
-            </div>
+        <div class="input-group">
+            <label for="entry">Entry Price (₹)</label>
+            <input type="text" id="entry" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
+        </div>
 
-            <div class="cap2">
-                Entry Price X Total Shares to Trade
-            </div>
-                
-            <div class="cap3" id="capital">
-                
-            </div>
+        <div class="input-group">
+            <label for="stoploss">Stoploss Price (₹)</label>
+            <input type="text" id="stoploss" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
+        </div>
+
+        <div class="input-group col-span-2">
+            <label for="lot-size">Lot size (Units)</label>
+            <input type="text" id="lot-size" class="input-field" oninput="formatInput(this); calculateRisk()" inputmode="numeric">
+        </div>
+        
+    </div>
+
+    <button onclick="calculateRisk()" class="calculate-button">
+        Calculate Risk and Targets
+    </button>
+
+    <div class="section-header">Risk Summary</div>
+    
+    <div class="grid-layout grid-cols-2">
+
+        <div class="input-group" id="rupees-risk-group"> 
+            <label>Rupees Risk per trade (₹)</label>
+            <output id="rupees-risk" class="output-field">0.00</output>
+        </div>
+
+        <div class="input-group" id="sl-per-unit-group">
+            <label>SL per unit (₹)</label>
+            <output id="sl-per-unit" class="output-field">0.00</output>
         </div>
     </div>
 
+    <div class="section-header">Position Sizing</div>
+
+    <div class="grid-layout grid-cols-2">
+
+        <div class="input-group" id="total-units-group"> 
+            <label>Total Units Allowed</label>
+            <output id="total-units" class="output-field">0.00</output>
+        </div>
+
+        <div class="input-group" id="lots-to-trade-group">
+            <label>Lots to Trade</label>
+            <output id="lots-to-trade" class="output-field">0.00</output>
+        </div>
+    </div>
+
+    <div class="section-header">Reward Targets (Based on SL per unit)</div>
+    
+    <div class="grid-layout grid-cols-4 grid-targets-mobile">
+        <div class="input-group">
+            <label>Target 1:1 (₹)</label>
+            <output id="target-1-1" class="output-field">0.00</output>
+        </div>
+
+        <div class="input-group">
+            <label>Target 1:2 (₹)</label>
+            <output id="target-1-2" class="output-field">0.00</output>
+        </div>
+
+        <div class="input-group">
+            <label>Target 1:3 (₹)</label>
+            <output id="target-1-3" class="output-field">0.00</output>
+        </div>
+
+        <div class="input-group">
+            <label>Target 1:5 (₹)</label>
+            <output id="target-1-5" class="output-field">0.00</output>
+        </div>
+    </div>
+    
+    <p id="error-message" class="error-message"></p>
+</div>
+
+<script>
+    /**
+     * Helper function to remove commas and other non-numeric characters (except decimals) 
+     * from an input string, ready for mathematical parsing.
+     */
+    const cleanNumber = (value) => {
+        if (!value) return '';
+        return value.toString().replace(/,/g, '').trim();
+    };
+
+    /**
+     * Custom function to format a number using the Indian numbering system (lakh/crore) 
+     * with an optional number of decimal places for output fields.
+     */
+    const formatIndianNumber = (num, decimals = 2) => {
+        if (typeof num !== 'number' || isNaN(num) || num === null) {
+            return decimals === 0 ? '0' : '0.00';
+        }
+        
+        const isNegative = num < 0;
+        let absNum = Math.abs(num);
+
+        let numStr = absNum.toString();
+        let [integerPart, fractionalPart] = numStr.split('.');
+        
+        // --- TRUNCATION LOGIC ---
+        if (decimals > 0) {
+            fractionalPart = fractionalPart ? fractionalPart.substring(0, decimals) : '';
+            fractionalPart = fractionalPart.padEnd(decimals, '0');
+        } else {
+            fractionalPart = '';
+        }
+
+        // Apply Indian formatting logic to the integer part (lakh/crore)
+        let lastThree = integerPart.slice(-3);
+        let remaining = integerPart.slice(0, -3);
+
+        if (remaining.length > 0) {
+            remaining = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+            integerPart = remaining + ',' + lastThree;
+        } else {
+            integerPart = lastThree;
+        }
+
+        let result = integerPart;
+
+        // Add decimal part back if necessary
+        if (decimals > 0) {
+            result += '.' + fractionalPart;
+        }
+
+        return isNegative ? '-' + result : result;
+    };
 
 
-   <script src="script.js"></script>
+    /**
+     * Formats the value of an input element with Indian (lakh/crore) comma separation 
+     * in real-time as the user types.
+     * Note: calculateRisk() is now chained after this function in the HTML.
+     */
+    const formatInput = (element) => {
+        const cursorPosition = element.selectionStart;
+        const originalValue = element.value;
+
+        // 1. Clean the value for processing (remove existing commas)
+        let cleanedValue = cleanNumber(originalValue);
+
+        // 2. Handle decimal point temporarily
+        let parts = cleanedValue.split('.');
+        let integerPart = parts[0];
+        let decimalPart = parts.length > 1 ? '.' + parts[1] : '';
+
+        // 3. Apply Indian formatting to the integer part
+        let lastThree = integerPart.slice(-3);
+        let remaining = integerPart.slice(0, -3);
+
+        if (remaining.length > 0) {
+            remaining = remaining.replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+            integerPart = remaining + ',' + lastThree;
+        } else {
+            integerPart = lastThree;
+        }
+        
+        let formattedValue = integerPart + decimalPart;
+
+        // 4. Update the input value
+        element.value = formattedValue;
+        
+        // 5. Calculate new cursor position
+        const newCommasCount = (formattedValue.match(/,/g) || []).length;
+        const oldCommasCount = (originalValue.match(/,/g) || []).length;
+        
+        let newCursorPosition = cursorPosition + (newCommasCount - oldCommasCount);
+        
+        // Ensure cursor is placed correctly, especially if a comma was just added
+        if (newCursorPosition >= 0 && newCursorPosition <= formattedValue.length) {
+            element.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+        // Calculation is now triggered by the chained call in the HTML 'oninput' attribute
+    };
+
+
+    function calculateRisk() {
+        const errorMessageElement = document.getElementById('error-message');
+        
+        // Retrieve values, ensuring they are parsed correctly
+        const capital = parseFloat(cleanNumber(document.getElementById('capital').value));
+        const riskPercentage = parseFloat(document.getElementById('risk-percentage').value);
+        const lotSize = parseFloat(cleanNumber(document.getElementById('lot-size').value));
+        const entryPrice = parseFloat(cleanNumber(document.getElementById('entry').value));
+        const stopLossPrice = parseFloat(cleanNumber(document.getElementById('stoploss').value));
+
+        // Reset outputs and error message
+        errorMessageElement.style.display = 'none';
+        document.getElementById('rupees-risk').textContent = '0.00';
+        document.getElementById('sl-per-unit').textContent = '0.00';
+        document.getElementById('total-units').textContent = '0.00';
+        document.getElementById('lots-to-trade').textContent = '0.00';
+        document.getElementById('target-1-1').textContent = '0.00';
+        document.getElementById('target-1-2').textContent = '0.00';
+        document.getElementById('target-1-3').textContent = '0.00';
+        document.getElementById('target-1-5').textContent = '0.00';
+
+
+        // 1. Validate Inputs (Only proceed if ALL critical numbers are valid)
+        if (isNaN(capital) || isNaN(riskPercentage) || isNaN(lotSize) || isNaN(entryPrice) || isNaN(stopLossPrice)) {
+            // No error message shown on initial load or partial entry, just return silently
+            return;
+        }
+
+        if (riskPercentage <= 0 || lotSize <= 0 || capital <= 0) {
+            errorMessageElement.textContent = 'Capital, Risk %, and Lot Size must be greater than zero.';
+            errorMessageElement.style.display = 'block';
+            return;
+        }
+
+        // 2. Calculate Rupees Risk Per Trade (R)
+        const rupeesRiskPerTrade = capital * (riskPercentage / 100);
+        document.getElementById('rupees-risk').textContent = formatIndianNumber(rupeesRiskPerTrade, 2);
+
+        // 3. Calculate SL per Unit (SLU)
+        const slPerUnit = Math.abs(entryPrice - stopLossPrice);
+        document.getElementById('sl-per-unit').textContent = formatIndianNumber(slPerUnit, 2);
+        
+        if (slPerUnit === 0) {
+            errorMessageElement.textContent = 'Entry Price and Stoploss Price cannot be the same (SL per unit is zero).';
+            errorMessageElement.style.display = 'block';
+            return;
+        }
+
+        // 4. Calculate Total Units Allowed (U)
+        const totalUnits = rupeesRiskPerTrade / slPerUnit;
+        document.getElementById('total-units').textContent = formatIndianNumber(totalUnits, 2);
+
+        // 5. Calculate Lots to Trade (LTT)
+        const calculatedLots = totalUnits / lotSize;
+        document.getElementById('lots-to-trade').textContent = formatIndianNumber(calculatedLots, 2);
+
+        // 6. Calculate Targets
+        
+        const isLongTrade = entryPrice > stopLossPrice;
+        
+        // Target calculation helper
+        const calculateTarget = (multiplier) => {
+            const priceMove = slPerUnit * multiplier;
+            let target;
+            if (isLongTrade) {
+                target = entryPrice + priceMove;
+            } else { 
+                target = entryPrice - priceMove;
+            }
+            return formatIndianNumber(target, 2);
+        };
+        
+        document.getElementById('target-1-1').textContent = calculateTarget(1);
+        document.getElementById('target-1-2').textContent = calculateTarget(2);
+        document.getElementById('target-1-3').textContent = calculateTarget(3);
+        document.getElementById('target-1-5').textContent = calculateTarget(5);
+    }
+
+    // Optional: Run on page load to set initial output formats
+    document.addEventListener('DOMContentLoaded', calculateRisk);
+</script>
+
 </body>
 </html>
